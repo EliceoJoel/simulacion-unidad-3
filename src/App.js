@@ -1,26 +1,34 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { Component } from 'react'
+import { BrowserRouter as Router, Route } from 'react-router-dom'
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+import Navbar from './components/Navbar'
+import Landing from './components/Landing'
+import Normal from './components/Normal'
+import Frecuencia from './components/Frecuencia'
+import Series from './components/Series'
+import KolmogorovSmirnov from './components/KolmogorovSmirnov'
+import Poker from './components/Poker'
+
+
+class App extends Component {
+  render() { 
+    return (
+      <Router>
+        <div className="App">
+          <Navbar />
+          <Route exact path="/" component={Landing} /> 
+          <div className="container">
+            <Route exact path="/normal" component={Normal} />
+            <Route exact path="/frecuencia" component={Frecuencia} />
+            <Route exact path="/series" component={Series} />
+            <Route exact path="/kolmogorov-smirnov" component={KolmogorovSmirnov} />
+            <Route exact path="/poker" component={Poker} />
+          </div>
+        </div>
+      </Router>
+    )
+  }
 }
 
-export default App;
+export default App
+
