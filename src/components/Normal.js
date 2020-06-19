@@ -109,6 +109,13 @@ class Normal extends Component {
   render() {
     return (
       <div className="container">
+        <div className="row my-5">
+          <div className="col-12 text-center">
+            <h3>
+              Prueba de la Normalidad
+            </h3>
+          </div>
+        </div>
         <div className="row mt-4">
           <form className="col-6">
             {this.state.showAlfa?
