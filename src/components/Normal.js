@@ -120,7 +120,7 @@ class Normal extends Component {
           <form className="col-6">
             {this.state.showAlfa?
               <div className="form-group">
-                <label htmlFor="dato">Primero guarde el dato alfa</label>
+                <label htmlFor="dato">Primero guarde el porcentaje alfa (Ej: 5)</label>
                 <input 
                   type="number" 
                   name="alfa"

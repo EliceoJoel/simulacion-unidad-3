@@ -150,7 +150,7 @@ class Frecuencia extends Component {
           <form className="col-6">
             {this.state.showAlfa?
               <div className="form-group">
-                <label htmlFor="alfa">Primero guarde el dato alfa</label>
+                <label htmlFor="alfa">Primero guarde el porcentaje alfa (Ej: 5)</label>
                 <input 
                   type="number" 
                   name="alfa"

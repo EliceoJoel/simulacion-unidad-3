@@ -15,7 +15,9 @@ class Poker extends Component {
       estadisticoError:"",
       muestras:"",
       conclusion:'',
-      normal:"",
+      Xo:"",
+      alfa:'',
+      alfaError:"",
       showAlfa:true,
       showDato:false
     }
@@ -41,18 +43,28 @@ class Poker extends Component {
       array.push(parseFloat(this.state.dato))
       let Fe = this.calcularFe()
       let Fo = this.calcularFo(arraymul)
+      let Xo = this.calcularXo(Fe, Fo)
       this.setState({
         muestra:array, 
         muestramul:arraymul,
         dato:'',
         datoError:'',
         n: this.state.n+1,
+        Xo: Xo,
         muestras:array.join(" - "),
-        resultados:"n="+(this.state.n+1)
+        resultados:"n="+(this.state.n+1) + ", Xo="+Xo
       }) 
     }else{
       this.setState({datoError:"Introduzca un dato"})
     }
+  }
+
+  calcularXo(Fe, Fo){
+    let res = 0
+    for (let i = 0; i < 7; i++) {
+      res = res + (Math.pow(Fe[i]-Fo[i],2))/Fe[i]  
+    }
+    return res
   }
 
   calcularFe(){
@@ -69,37 +81,36 @@ class Poker extends Component {
   }
 
   calcularFo(muestra){
-    console.log(muestra)
     let res = new Array (7)
     res.fill(0)
     for (let i=0 ; i<muestra.length ; i++){
-      if(this.isTD(muestra[i])){
+      if(this.queEs(muestra[i]) === "TD"){
         res[0] = res[0]+1
       }
-      if(this.is1P(muestra[i])){
+      if(this.queEs(muestra[i]) === "1P"){
         res[1] = res[1]+1
       }
-      if(this.is2P(muestra[i])){
+      if(this.queEs(muestra[i]) === "2P"){
         res[2] = res[2]+1
       }
-      if(this.isT(muestra[i])){
+      if(this.queEs(muestra[i]) === "T"){
         res[3] = res[3]+1
       }
-      if(this.isF(muestra[i])){
+      if(this.queEs(muestra[i]) === "F"){
         res[4] = res[4]+1
       }
-      if(this.isPK(muestra[i])){
+      if(this.queEs(muestra[i]) === "PK"){
         res[5] = res[5]+1
       }
-      if(this.isTI(muestra[i])){
+      if(this.queEs(muestra[i]) === "TI"){
         res[6] = res[6]+1
       }
     }
     return res
   }
 
-  isTD(numero){
-    let res = false
+  queEs(numero){
+    let res = ""
     let arrayDigitos = []
     numero.split('').forEach(x => arrayDigitos.push(x))
     let resultados = []
@@ -114,56 +125,59 @@ class Poker extends Component {
         }
       }
       resultados.push(contadorIguales)
-      console.log(resultados)
     }
+    res = this.tipo(resultados)
     return res
   }
 
-  is1P(numero){
-    let res = false
-    return res
+  tipo(array){
+  let res = ''
+  if(array.length === 5){res = "TD"}
+  if(array.length ===4){res = "1P"}
+  if(array.length ===3){
+    if(array.indexOf(3) === -1){res = "2P"}
+    else{res = "T"}
   }
-
-  is2P(numero){
-    let res = false
-    return res
+  if(array.length ===2){
+    if(array.indexOf(4) === -1){res = "F"}
+    else{res = "PK"}
   }
-
-  isT(numero){
-    let res = false
-    return res
+  if(array.length ===1){res = "TI"} 
+  return res
   }
-
-  isF(numero){
-    let res = false
-    return res
-  }
-
-  isPK(){
-    let res = false
-    return res
-  }
-
-  isTI(numero){
-    let res = false
-    return res
-  }
-
 
 
   guardarEstaditico(){
-    if(this.state.muestra.length !== 0){
-      if(this.state.estadistico !== ''){
-         if(parseFloat(this.state.Zo) < parseFloat(this.state.estadistico)){
-            this.setState({conclusion:"Uniformidad"})
-         }else{
-          this.setState({conclusion:"No Uniformidad"})
-         }
+    if(this.state.alfa!== ''){
+      if(this.state.muestra.length !== 0){
+        if(this.state.estadistico !== ''){
+           if(parseFloat(this.state.Xo) < parseFloat(this.state.estadistico)){
+              this.setState({conclusion:"Uniformidad"})
+           }else{
+            this.setState({conclusion:"No Uniformidad"})
+           }
+        }else{
+          this.setState({estadisticoError:"Introduzca el estaditico teorico"})
+        }
       }else{
-        this.setState({estadisticoError:"Introduzca el estaditico teorico"})
+        this.setState({datoError:"Introduzca un dato"})
       }
     }else{
-      this.setState({datoError:"Introduzca un dato"})
+      this.setState({alfaError:"Introduzca el dato alfa"})
+    }
+  }
+
+  guardarAlfa(){
+    if(this.state.alfa !== ''){
+      this.setState({
+        showAlfa:false, 
+        showDato:true, 
+        resultados:"alfa = " + this.state.alfa, 
+      })
+    }else{
+      this.setState({
+        alfaError:"Introduzca el dato alfa"
+      })
     }
   }
 
@@ -179,19 +193,39 @@ class Poker extends Component {
         </div>
         <div className="row mt-4">
           <form className="col-6">
-            <div className="form-group">
-              <label htmlFor="dato">Cargue los datos de la muestra (deben ser de cinco decimales Ej: 0.21324) evite colocar 0.00000</label>
-              <input 
-                type="number" 
-                name="dato"
-                className="form-control" 
-                placeholder="Introduce un dato de la muestra"
-                value={this.state.dato}
-                onChange={this.onChange}
-                />
-                <p style={{color:"red"}}>{this.state.datoError}</p>
-                <button type="button" className="btn btn-success" onClick={()=>this.cargarDatos()}>Cargar</button>
-            </div>
+          {this.state.showAlfa?
+              <div className="form-group">
+                <label htmlFor="dato">Primero guarde el porcentaje alfa (Ej: 5)</label>
+                <input 
+                  type="number" 
+                  name="alfa"
+                  className="form-control" 
+                  placeholder="Introduce el porcentaje de alfa"
+                  value={this.state.alfa}
+                  onChange={this.onChange}
+                  />
+                  <p style={{color:"red"}}>{this.state.alfaError}</p>
+                  <button type="button" className="btn btn-success" 
+                    onClick={()=>this.guardarAlfa()}>
+                    Guardar alfa
+                  </button>
+              </div>
+            :null}
+            {this.state.showDato?
+              <div className="form-group">
+                <label htmlFor="dato">Ahora cargue los datos de la muestra, estos deben ser de 5 decimales (Ej: 0.78656)</label>
+                <input 
+                  type="number" 
+                  name="dato"
+                  className="form-control" 
+                  placeholder="Introduce un dato de la muestra"
+                  value={this.state.dato}
+                  onChange={this.onChange}
+                  />
+                  <p style={{color:"red"}}>{this.state.datoError}</p>
+                  <button type="button" className="btn btn-success" onClick={()=>this.cargarDatos()}>Cargar</button>
+              </div>
+            :null}
           </form>
           <div className="col-6 border text-center">
             <label htmlFor="datos"><b>Muestra</b></label>
@@ -208,7 +242,7 @@ class Poker extends Component {
         </div>
         <div className="row">
           <div className="form-group col-6">
-            <p>{"busca en la tabla normal: "}<b>{this.state.normal}</b></p>
+            <p>{"busca en la tabla Chi cuadrada: alfa="}<b>{parseInt(this.state.alfa)/100}</b>{" y k-1="}<b>{"6"}</b></p>
             <label htmlFor="estadistico">Introduzca el estadistico teorico</label>
             <input 
               type="number" 
