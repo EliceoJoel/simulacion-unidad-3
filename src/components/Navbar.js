@@ -40,11 +40,6 @@ class Landing extends Component {
                 </Link>
               </li>
               <li className="nav-item ml-auto px-2">
-                <Link to="series" className="nav-link">
-                  Prueba de series
-                </Link>
-              </li>
-              <li className="nav-item ml-auto px-2">
                 <Link to="kolmogorov-smirnov" className="nav-link">
                   Prueba de kolmogorov smirnov
                 </Link>
